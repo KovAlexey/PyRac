@@ -18,13 +18,19 @@ class PacketType:
     CONNECT = b'x01'
     CONNECT_ACK = b'\x02'
     PACKET_TYPE_ENDPOINT_OPEN = b'\x0B'
+    PACKET_TYPE_MESSAGE = b'\x0E'
+    PACKET_CLASTER_LIST = b'\x05'
 
+
+class PacketMessage:
+    CLUSTER_LIST = b'\x0b'
 
 class RacPacket:
     _data = b''
+    _type = b''
 
     def __init__(self, _type=b''):
-        self._data = _type
+        self._type = _type
 
     def add_integer(self, integer):
         intbuff = struct.pack('>i', integer)
@@ -56,7 +62,14 @@ class RacPacket:
 
     def form_size_packet(self, packet_type):
         new_packet = RacPacket()
-        new_packet.add_bytes(packet_type)
+        new_packet.add_bytes(self._type)
         new_packet.add_varint(len(self._data))
 
         return new_packet
+
+    def add_header(self, message_byte):
+        self._data = b'\x01\x00\x00\x01'
+        self.add_bytes(message_byte)
+
+    def getpackettype(self):
+        return self._type

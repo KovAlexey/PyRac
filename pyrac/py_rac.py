@@ -17,9 +17,10 @@ class Param:
 
 
 
-client_ip = 'r3d3'
+client_ip = 'localhost'
 client_port = 1545
 
 connection = RacConnection(client_ip, client_port)
 connection.connect()
+connection.recv_cluster_ojects()
 connection.disconnect()

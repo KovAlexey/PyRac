@@ -17,4 +17,17 @@ class varintCodec:
                 break
         return buffer
 
+    @staticmethod
+    def DecodeFromStream(stream):
+        buffer = 0
+        shift = 0
+        while True:
+            bytes_recv = stream.read(1)
+            value = bytes_recv[0] & 0b01111111
+            buffer |= (value << shift)
+            shift += 7
+            if not bytes_recv[0] & 0b10000000:
+                break
+        return buffer
+
 

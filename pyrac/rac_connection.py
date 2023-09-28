@@ -1,5 +1,61 @@
 import socket
-from pyrac.rac_packet import RacPacket, NegotiateMessage, PacketType
+import io
+from pyrac.rac_packet import RacPacket, NegotiateMessage, PacketType, PacketMessage
+from varint import varintCodec
+import uuid
+
+
+class ClusterObject:
+    __guid = b''
+    __host = ''
+    __port = 0
+    __name = ''
+    __expiration_timeout = 0
+    __lifetime_limit = 0
+    __restart_interval = 0
+    __memory_size = 0
+    __max_memory_limit = 0
+    __terminate_problem_process = 0
+    __secure_connection = 0
+    __fault_tolerance_level = 0
+    __load_balancing_mode = 0
+    __errors_count_threshold = 0
+    __kill_problem_processes = False
+    __kill_by_memory_with_dump = True
+
+    def __init__(self, file):
+        self.__guid = uuid.UUID(bytes=file.read(16))  # GUID
+        self.__terminate_problem_process = int.from_bytes(file.read(4), 'big')  # terminate problem process
+        lenght = varintCodec.DecodeFromStream(file)
+        self.__host = file.read(lenght).decode()
+        self.__restart_interval = int.from_bytes(file.read(4), 'big')  # restart interval
+        self.__port = int.from_bytes(file.read(2), 'big')  # port
+        self.__memory_size = int.from_bytes(file.read(4), 'big')  # memory size
+        self.__max_memory_limit = int.from_bytes(file.read(4), 'big')  # max memory limit
+        lenght = varintCodec.DecodeFromStream(file)
+        self.__name = file.read(lenght).decode()
+        self.__secure_connection = int.from_bytes(file.read(4), 'big')
+        self.__fault_tolerance_level = int.from_bytes(file.read(4), 'big')
+        self.__load_balancing_mode = int.from_bytes(file.read(4), 'big')
+        self.__errors_count_threshold = int.from_bytes(file.read(4), 'big')
+        self.__kill_problem_processes = bool.from_bytes(file.read(1), 'big')
+        self.__kill_by_memory_with_dump = bool.from_bytes(file.read(1), 'big')
+
+
+    @staticmethod
+    def CreateFromBytes(bytes):
+        file = io.BytesIO(bytes)
+        start_bytes = file.read(4)
+        packet_type = file.read(1)
+        count = varintCodec.DecodeFromStream(file)
+
+        clusterObjects = []
+
+        for i in range(count):
+            clusterObject = ClusterObject(file)
+            clusterObjects.append(clusterObject)
+        return clusterObjects
+
 
 
 class RacConnection:
@@ -26,7 +82,7 @@ class RacConnection:
 
         answer = self._socket.recv(next_packet_size)
 
-        cluster_list_message = RacPacket()
+        cluster_list_message = RacPacket(PacketType.PACKET_TYPE_ENDPOINT_OPEN)
         cluster_list_message.add_string('v8.service.Admin.Cluster')
         cluster_list_message.add_string('10.0')
         cluster_list_message.end_this_packet()
@@ -36,6 +92,19 @@ class RacConnection:
         next_packet_size = self.recv_sizepacket()
         print(next_packet_size)
         print(self._socket.recv(next_packet_size))
+
+    def recv_cluster_ojects(self):
+        packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
+        packet.add_header(PacketMessage.CLUSTER_LIST)
+
+        self.send_with_size(packet)
+
+        packet_size = self.recv_sizepacket()
+        data = self._socket.recv(packet_size)
+
+        clusters = ClusterObject.CreateFromBytes(data)
+
+        print(data)
 
     def recv_sizepacket(self):
         # start byte
@@ -62,6 +131,6 @@ class RacConnection:
         self._socket.send(data.get_data())
 
     def send_with_size(self, data: RacPacket):
-        size_packet = data.form_size_packet(PacketType.PACKET_TYPE_ENDPOINT_OPEN)
+        size_packet = data.form_size_packet(data.getpackettype())
         self._socket.send(size_packet.get_data())
         self._socket.send(data.get_data())
