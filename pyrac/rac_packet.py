@@ -29,7 +29,7 @@ class PacketMessage:
     # GUID кластера
     # Пользователь - 0x00, если нет
     # Пароль - 0x00, если нет
-    CLUSTER_AUTHENTICATION = b'\x09'  # ???
+    CLUSTER_AUTHENTICATION = b'\x09'
 
     # Получить список информационных баз
     # Аргументы: ГУИД кластера
