@@ -29,16 +29,27 @@ class PacketMessage:
     # GUID кластера
     # Пользователь - 0x00, если нет
     # Пароль - 0x00, если нет
-    CLUSTER_AUTHENTICATION = b'\x09'
+    CLUSTER_AUTHENTICATION_QUERY = b'\x09'
 
     # Получить список информационных баз
     # Аргументы: ГУИД кластера
-    GET_INFOBASE_LIST_SUMMARY = b'\x2A'
+    INFOBASE_LIST_SUMMARY_QUERY = b'\x2A'
     # Короткий список информационных баз
     # Аргументы
     # Количество ИБ
     # (Гуид - гуид, Имя - строка, Описание - строка)
-    INFOBASE_SUMMARY_ANSWER = b'\x2B'
+    INFOBASE_LIST_SUMMARY_ANSWER = b'\x2B'
+
+    # То же, что INFOBASE_LIST_SUMMARY_QUERY
+    # Но для конкретной базы
+    # Аргументы (ГУИД - гуид кластера, ГУИД - гуид ИБ)
+    INFOBASE_FOR_INFOBASE_SUMMARY_QUERY = b'\x2E'
+
+    # Краткое описание информационной базы
+    # То же, что INFOBASE_LIST_SUMMARY_ANSWER, но для конкретной базы без укзаания количества
+    INFOBASE_FOR_INFOBASE_SUMMARY_ANSWER = b'\x2F'
+
+
 
 
 class RacPacket:

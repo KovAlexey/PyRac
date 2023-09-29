@@ -30,6 +30,9 @@ class RacInfobaseObject:
     __safe_mode_securirty_profile = ''
     __reserve_working_processes = False
 
+    def getuuid(self):
+        return self.__uuid
+
     def update_from_full(self, bytes_io_in):
         self.__uuid = uuid.UUID(bytes=bytes_io_in.read(16))  # GUID
         self.__date_offset = int.from_bytes(bytes_io_in.read(4), 'big')
@@ -58,11 +61,14 @@ class RacInfobaseObject:
         start_bytes = file.read(4)
         packet_type = file.read(1)
 
-        count = varintCodec.DecodeFromStream(file)
+        if packet_type == PacketMessage.INFOBASE_FOR_INFOBASE_SUMMARY_ANSWER:
+            count = 1
+        else:
+            count = varintCodec.DecodeFromStream(file)
         databases = []
         for i in range(count):
             db_object = RacInfobaseObject()
-            if packet_type == PacketMessage.INFOBASE_SUMMARY_ANSWER:
+            if packet_type in PacketMessage.INFOBASE_LIST_SUMMARY_ANSWER:
                 db_object.update_from_summary(file)
             else:
                 db_object.update_from_full(file)
