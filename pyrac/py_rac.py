@@ -22,5 +22,7 @@ client_port = 1545
 
 connection = RacConnection(client_ip, client_port)
 connection.connect()
-connection.recv_cluster_ojects()
+clusters = connection.recv_cluster_objects()
+connection.check_cluster(clusters[0])
+connection.get_infobase_list(clusters[0])
 connection.disconnect()

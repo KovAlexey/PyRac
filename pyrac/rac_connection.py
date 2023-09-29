@@ -23,6 +23,9 @@ class ClusterObject:
     __kill_problem_processes = False
     __kill_by_memory_with_dump = True
 
+    def getGuid(self):
+        return self.__guid
+
     def __init__(self, file):
         self.__guid = uuid.UUID(bytes=file.read(16))  # GUID
         self.__terminate_problem_process = int.from_bytes(file.read(4), 'big')  # terminate problem process
@@ -41,7 +44,6 @@ class ClusterObject:
         self.__kill_problem_processes = bool.from_bytes(file.read(1), 'big')
         self.__kill_by_memory_with_dump = bool.from_bytes(file.read(1), 'big')
 
-
     @staticmethod
     def CreateFromBytes(bytes):
         file = io.BytesIO(bytes)
@@ -55,7 +57,6 @@ class ClusterObject:
             clusterObject = ClusterObject(file)
             clusterObjects.append(clusterObject)
         return clusterObjects
-
 
 
 class RacConnection:
@@ -93,18 +94,50 @@ class RacConnection:
         print(next_packet_size)
         print(self._socket.recv(next_packet_size))
 
-    def recv_cluster_ojects(self):
+    def recv_cluster_objects(self):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
         packet.add_header(PacketMessage.CLUSTER_LIST)
 
         self.send_with_size(packet)
 
         packet_size = self.recv_sizepacket()
-        data = self._socket.recv(packet_size)
+        recv_len = 0
+        data = b''
+        while recv_len < packet_size:
+            data += self._socket.recv(packet_size)
+            recv_len = len(data)
 
         clusters = ClusterObject.CreateFromBytes(data)
+        return clusters
 
-        print(data)
+    def check_cluster(self, clusterObject: ClusterObject):
+        packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
+        packet.add_header(PacketMessage.CLUSTER_CHECK)
+        packet.add_bytes(clusterObject.getGuid().bytes)
+        packet.add_bytes(b'\x00\x00') # Этот запрос
+
+        self.send_with_size(packet)
+
+        packet_size = self.recv_sizepacket()
+        recv_len = 0
+        data = b''
+        while recv_len < packet_size:
+            data += self._socket.recv(packet_size)
+            recv_len = len(data)
+
+    def get_infobase_list(self, clusterObject: ClusterObject):
+        packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
+        packet.add_header(PacketMessage.GET_INFOBASE_LIST_SUMMARY)
+        packet.add_bytes(clusterObject.getGuid().bytes)
+
+        self.send_with_size(packet)
+
+        packet_size = self.recv_sizepacket()
+        recv_len = 0
+        data = b''
+        while recv_len < packet_size:
+            data += self._socket.recv(packet_size)
+            recv_len = len(data)
 
     def recv_sizepacket(self):
         # start byte

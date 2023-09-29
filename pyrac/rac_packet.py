@@ -19,11 +19,22 @@ class PacketType:
     CONNECT_ACK = b'\x02'
     PACKET_TYPE_ENDPOINT_OPEN = b'\x0B'
     PACKET_TYPE_MESSAGE = b'\x0E'
-    PACKET_CLASTER_LIST = b'\x05'
 
 
 class PacketMessage:
-    CLUSTER_LIST = b'\x0b'
+    CLUSTER_LIST = b'\x0b'  # Возвращает список кластеров
+
+    # Возможно проверка существования кластера? Возвращает 0,если он существует. И ошибку, если нет.
+    # В любом случае RAC отправляет его каждый раз, перед тем как получить список информационных баз кластера
+    # И только в случае успеха отправляет уже получение списка
+    # Аргументы: GUID кластера и возможно что-то значащие \x00\x00
+    CLUSTER_CHECK = b'\x09'  # ???
+
+    # Получить список информационных баз
+    # Аргументы: ГУИД кластера
+    GET_INFOBASE_LIST_SUMMARY = b'\x2A'
+
+
 
 class RacPacket:
     _data = b''
