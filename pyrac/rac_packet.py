@@ -34,7 +34,11 @@ class PacketMessage:
     # Получить список информационных баз
     # Аргументы: ГУИД кластера
     GET_INFOBASE_LIST_SUMMARY = b'\x2A'
-
+    # Короткий список информационных баз
+    # Аргументы
+    # Количество ИБ
+    # (Гуид - гуид, Имя - строка, Описание - строка)
+    INFOBASE_SUMMARY_ANSWER = b'\x2B'
 
 
 class RacPacket:

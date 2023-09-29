@@ -4,6 +4,7 @@ import uuid
 from varint import varintCodec
 
 
+
 class RacClusterObject:
     __guid = b''
     __host = ''

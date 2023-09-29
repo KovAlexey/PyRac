@@ -1,9 +1,4 @@
-import socket
-import struct
-import array
-from varint import varintCodec
-from pyrac.rac_packet import RacPacket
-from  pyrac.rac_connection import RacConnection
+from pyrac.rac_connection import RacConnection
 
 
 
@@ -24,5 +19,5 @@ connection = RacConnection(client_ip, client_port)
 connection.connect()
 clusters = connection.recv_cluster_objects()
 connection.authentication(clusters[0])
-connection.get_infobase_list(clusters[0])
+db_list = connection.get_infobase_list(clusters[0])
 connection.disconnect()

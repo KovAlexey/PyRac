@@ -1,8 +1,11 @@
 import uuid
+import io
+from varint import varintCodec
+from pyrac.rac_packet import PacketMessage
 
 
 class RacInfobaseObject:
-    __uuid = b''
+    __uuid = None
     __date_offset = 0
     __dmbs = ''
     __db_name = ''
@@ -26,3 +29,43 @@ class RacInfobaseObject:
     __securirty_profile = ''
     __safe_mode_securirty_profile = ''
     __reserve_working_processes = False
+
+    def update_from_full(self, bytes_io_in):
+        self.__uuid = uuid.UUID(bytes=bytes_io_in.read(16))  # GUID
+        self.__date_offset = int.from_bytes(bytes_io_in.read(4), 'big')
+        len_str = varintCodec.DecodeFromStream(bytes_io_in)
+        self.__dbms = bytes_io_in.read(len_str).decode()
+        len_str = varintCodec.DecodeFromStream(bytes_io_in)
+        self.__db_name = bytes_io_in.read(len_str).decode()
+        len_str = varintCodec.DecodeFromStream(bytes_io_in)
+        self.__db_password = bytes_io_in.read(len_str).decode()
+        len_str = varintCodec.DecodeFromStream(bytes_io_in)
+        self.__db_server_name = bytes_io_in.read(len_str).decode()
+        len_str = varintCodec.DecodeFromStream(bytes_io_in)
+        self.__db_user = bytes_io_in.read(len_str).decode()
+
+    # TODO: вариант метода для коллекции с поиском по гуиду
+    def update_from_summary(self, bytes_io_in):
+        self.__uuid = uuid.UUID(bytes=bytes_io_in.read(16))  # GUID
+        lenght = varintCodec.DecodeFromStream(bytes_io_in)
+        self.__name = bytes_io_in.read(lenght).decode()
+        lenght = varintCodec.DecodeFromStream(bytes_io_in)
+        self.__descr = bytes_io_in.read(lenght).decode()
+
+    @staticmethod
+    def CreateFromBytes(bytes):
+        file = io.BytesIO(bytes)
+        start_bytes = file.read(4)
+        packet_type = file.read(1)
+
+        count = varintCodec.DecodeFromStream(file)
+        databases = []
+        for i in range(count):
+            db_object = RacInfobaseObject()
+            if packet_type == PacketMessage.INFOBASE_SUMMARY_ANSWER:
+                db_object.update_from_summary(file)
+            else:
+                db_object.update_from_full(file)
+            databases.append(db_object)
+        return databases
+

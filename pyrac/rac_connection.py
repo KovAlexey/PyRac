@@ -1,6 +1,7 @@
 import socket
 
 from pyrac.rac_cluster_object import RacClusterObject
+from pyrac.rac_infobase_object import RacInfobaseObject
 from pyrac.rac_packet import RacPacket, NegotiateMessage, PacketType, PacketMessage
 
 
@@ -81,6 +82,8 @@ class RacConnection:
         self.send_with_size(packet)
 
         data = self.recv_with_size()
+        ib_list = RacInfobaseObject.CreateFromBytes(data)
+        return ib_list
 
 
     def recv_sizepacket(self):
