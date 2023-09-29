@@ -110,13 +110,20 @@ class RacConnection:
         clusters = ClusterObject.CreateFromBytes(data)
         return clusters
 
-    def authentication(self, clusterObject: ClusterObject):
+    def authentication(self, clusterObject: ClusterObject, login="", password=""):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
         packet.add_header(PacketMessage.CLUSTER_AUTHENTICATION)
         packet.add_bytes(clusterObject.getGuid().bytes)
-        # TODO: логин и пароль строкой с длиной varint
-        packet.add_bytes(b'\x00') # Пустой логин
-        packet.add_bytes(b'\x00') # Пустой пароль
+
+        if len(login) > 0:
+            packet.add_string(login)
+        else:
+            packet.add_bytes(b'\x00')  # Пустой логин
+
+        if len(password) > 0:
+            packet.add_string(password)
+        else:
+            packet.add_bytes(b'\x00')  # Пустой пароль
 
         self.send_with_size(packet)
 
