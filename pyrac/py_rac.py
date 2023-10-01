@@ -1,4 +1,5 @@
 from pyrac.rac_connection import RacConnection
+import json
 
 
 
@@ -15,9 +16,15 @@ class Param:
 client_ip = 'localhost'
 client_port = 1545
 
+logpass = dict()
+with open('logpass.txt') as f:
+    logpass = json.loads(f.read())
+
 connection = RacConnection(client_ip, client_port)
 connection.connect()
 clusters = connection.recv_cluster_objects()
 connection.authentication(clusters[0])
-db_list = connection.get_infobase_list(clusters[0])
+db_list = connection.get_infobase_summary_list(clusters[0])
+summary_for_base = connection.get_infobase_summary_for_infobase(clusters[0], db_list[0])
+data = connection.get_infobase_full_info(clusters[0], db_list[0], logpass["login"], logpass["pwd"])
 connection.disconnect()

@@ -53,7 +53,7 @@ class RacConnection:
     def authentication(self, clusterObject: RacClusterObject, login="", password=""):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
         packet.add_header(PacketMessage.CLUSTER_AUTHENTICATION_QUERY)
-        packet.add_bytes(clusterObject.getGuid().bytes)
+        packet.add_bytes(clusterObject.getuuid().bytes)
 
         if len(login) > 0:
             packet.add_string(login)
@@ -74,10 +74,24 @@ class RacConnection:
             data += self._socket.recv(packet_size)
             recv_len = len(data)
 
+    def get_infobase_full_info(self, clusterObject: RacClusterObject, infobaseObject: RacInfobaseObject, login='', pwd=''):
+        packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
+        packet.add_header(PacketMessage.INFOBASE_FULL_INFO_REQUEST)
+        packet.add_bytes(clusterObject.getuuid().bytes)
+        packet.add_bytes(infobaseObject.getuuid().bytes)
+        if len(login) > 0:
+            packet.add_string(login)
+        if len(pwd) > 0:
+            packet.add_string(pwd)
+
+        self.send_with_size(packet)
+        data = self.recv_with_size()
+        print(data)
+
     def get_infobase_summary_list(self, clusterObject: RacClusterObject):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
         packet.add_header(PacketMessage.INFOBASE_LIST_SUMMARY_QUERY)
-        packet.add_bytes(clusterObject.getGuid().bytes)
+        packet.add_bytes(clusterObject.getuuid().bytes)
 
         self.send_with_size(packet)
 
@@ -88,7 +102,7 @@ class RacConnection:
     def get_infobase_summary_for_infobase(self, clusterObject: RacClusterObject, infobase: RacInfobaseObject):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
         packet.add_header(PacketMessage.INFOBASE_FOR_INFOBASE_SUMMARY_QUERY)
-        packet.add_bytes(clusterObject.getGuid().bytes)
+        packet.add_bytes(clusterObject.getuuid().bytes)
         packet.add_bytes(infobase.getuuid().bytes)
 
         self.send_with_size(packet)

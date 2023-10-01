@@ -22,6 +22,7 @@ class PacketType:
 
 
 class PacketMessage:
+    REQUEST_FAILED = b'\xFF' # судя по всему в случае ошибок, заголовком является FF
     CLUSTER_LIST = b'\x0b'  # Возвращает список кластеров
 
     # Авторизация
@@ -49,7 +50,12 @@ class PacketMessage:
     # То же, что INFOBASE_LIST_SUMMARY_ANSWER, но для конкретной базы без укзаания количества
     INFOBASE_FOR_INFOBASE_SUMMARY_ANSWER = b'\x2F'
 
-
+    # Полное описание информационной базы
+    # 3 аргумента по порядку
+    # UUID базы, логин (ничего, если нет) от ИБ, пароль от ИБ (ничего, если не требуется)
+    # Или это все таки авторизация в ИБ? RAC сначала выполняет это действие и в случае успеха уже запрашивает инфу о БД
+    INFOBASE_FULL_INFO_REQUEST = b'\x0A'
+    INFOBASE_FULL_INFO_REQUEST_VAR2 = b'\x30'
 
 
 class RacPacket:

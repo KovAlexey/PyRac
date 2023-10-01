@@ -68,10 +68,11 @@ class RacInfobaseObject:
         databases = []
         for i in range(count):
             db_object = RacInfobaseObject()
-            if packet_type in PacketMessage.INFOBASE_LIST_SUMMARY_ANSWER:
-                db_object.update_from_summary(file)
-            else:
-                db_object.update_from_full(file)
+            #if packet_type == PacketMessage.INFOBASE_FULL_INFO_REQUEST:
+            #    db_object.update_from_full(file)
+            #else:
+            db_object.update_from_summary(file)
+
             databases.append(db_object)
         return databases
 

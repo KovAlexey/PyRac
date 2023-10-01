@@ -23,7 +23,7 @@ class RacClusterObject:
     __kill_problem_processes = False
     __kill_by_memory_with_dump = True
 
-    def getGuid(self):
+    def getuuid(self):
         return self.__guid
 
     def __init__(self, file):
