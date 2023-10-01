@@ -74,9 +74,9 @@ class RacConnection:
             data += self._socket.recv(packet_size)
             recv_len = len(data)
 
-    def get_infobase_full_info(self, clusterObject: RacClusterObject, infobaseObject: RacInfobaseObject, login='', pwd=''):
+    def authentication_to_ib(self, clusterObject: RacClusterObject, infobaseObject: RacInfobaseObject, login='', pwd=''):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
-        packet.add_header(PacketMessage.INFOBASE_FULL_INFO_REQUEST)
+        packet.add_header(PacketMessage.INFOBASE_AUTORIZATION_REQUEST)
         packet.add_bytes(clusterObject.getuuid().bytes)
         packet.add_bytes(infobaseObject.getuuid().bytes)
         if len(login) > 0:
@@ -86,6 +86,18 @@ class RacConnection:
 
         self.send_with_size(packet)
         data = self.recv_with_size()
+
+    def get_infobase_full_info(self, clusterObject: RacClusterObject, infobaseObject: RacInfobaseObject):
+        packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
+        packet.add_header(PacketMessage.INFOBASE_FULL_INFO_REQUEST)
+        packet.add_bytes(clusterObject.getuuid().bytes)
+        packet.add_bytes(infobaseObject.getuuid().bytes)
+
+        self.send_with_size(packet)
+        data = self.recv_with_size()
+
+        ib_full_info = RacInfobaseObject.CreateFromBytes(data)
+
         print(data)
 
     def get_infobase_summary_list(self, clusterObject: RacClusterObject):
@@ -109,6 +121,7 @@ class RacConnection:
 
         data = self.recv_with_size()
         ib_summary = RacInfobaseObject.CreateFromBytes(data)
+        return ib_summary
 
 
     def recv_sizepacket(self):

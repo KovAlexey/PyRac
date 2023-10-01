@@ -50,12 +50,21 @@ class PacketMessage:
     # То же, что INFOBASE_LIST_SUMMARY_ANSWER, но для конкретной базы без укзаания количества
     INFOBASE_FOR_INFOBASE_SUMMARY_ANSWER = b'\x2F'
 
+    # Авторизация в ИБ
+    # Аргументы:
+    #   uuid кластера
+    #   uuid ИБ
+    #   Логин (ничего, если нет)
+    #   Пароль (ничего, если нет)
+    INFOBASE_AUTORIZATION_REQUEST = b'\x0A'
+
     # Полное описание информационной базы
     # 3 аргумента по порядку
     # UUID базы, логин (ничего, если нет) от ИБ, пароль от ИБ (ничего, если не требуется)
     # Или это все таки авторизация в ИБ? RAC сначала выполняет это действие и в случае успеха уже запрашивает инфу о БД
-    INFOBASE_FULL_INFO_REQUEST = b'\x0A'
-    INFOBASE_FULL_INFO_REQUEST_VAR2 = b'\x30'
+    INFOBASE_FULL_INFO_REQUEST = b'\x30'
+
+    INFOBASE_FULL_INFO_ANSWER = b'\x31'
 
 
 class RacPacket:

@@ -61,17 +61,17 @@ class RacInfobaseObject:
         start_bytes = file.read(4)
         packet_type = file.read(1)
 
-        if packet_type == PacketMessage.INFOBASE_FOR_INFOBASE_SUMMARY_ANSWER:
+        if packet_type in (PacketMessage.INFOBASE_FOR_INFOBASE_SUMMARY_ANSWER, PacketMessage.INFOBASE_FULL_INFO_ANSWER):
             count = 1
         else:
             count = varintCodec.DecodeFromStream(file)
         databases = []
         for i in range(count):
             db_object = RacInfobaseObject()
-            #if packet_type == PacketMessage.INFOBASE_FULL_INFO_REQUEST:
-            #    db_object.update_from_full(file)
-            #else:
-            db_object.update_from_summary(file)
+            if packet_type == PacketMessage.INFOBASE_FULL_INFO_ANSWER:
+                db_object.update_from_full(file)
+            else:
+                db_object.update_from_summary(file)
 
             databases.append(db_object)
         return databases
