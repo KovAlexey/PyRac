@@ -53,6 +53,7 @@ class RacInfobaseObject:
         lenght = varintCodec.DecodeFromStream(bytes_io_in)
         self.__name = bytes_io_in.read(lenght).decode()
         lenght = varintCodec.DecodeFromStream(bytes_io_in)
+
         self.__descr = bytes_io_in.read(lenght).decode()
 
     @staticmethod

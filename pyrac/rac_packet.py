@@ -50,12 +50,16 @@ class PacketMessage:
     # То же, что INFOBASE_LIST_SUMMARY_ANSWER, но для конкретной базы без укзаания количества
     INFOBASE_FOR_INFOBASE_SUMMARY_ANSWER = b'\x2F'
 
-    # Авторизация в ИБ
+    # судя по всему еще авторизация, но непонятно где
+    # но без этой авторизации часть информации по ИБ доступна не будет
+    # А INFOBASE_FULL_INFO_REQUEST выдаст исключение по правам
     # Аргументы:
     #   uuid кластера
-    #   uuid ИБ
     #   Логин (ничего, если нет)
     #   Пароль (ничего, если нет)
+    # Возвращается:
+    #   0x00 0x01 0x00 0x00 в случае успеха
+    #   В случае отказа - нужно разобрать как получать ошибки из RAS
     INFOBASE_AUTORIZATION_REQUEST = b'\x0A'
 
     # Полное описание информационной базы
@@ -63,7 +67,6 @@ class PacketMessage:
     # UUID базы, логин (ничего, если нет) от ИБ, пароль от ИБ (ничего, если не требуется)
     # Или это все таки авторизация в ИБ? RAC сначала выполняет это действие и в случае успеха уже запрашивает инфу о БД
     INFOBASE_FULL_INFO_REQUEST = b'\x30'
-
     INFOBASE_FULL_INFO_ANSWER = b'\x31'
 
 
@@ -86,7 +89,7 @@ class RacPacket:
     def add_string(self, string):
         length = len(string)
 
-        temp_string = bytes(string, encoding='ANSI')
+        temp_string = bytes(string, encoding='utf-8')
         buffer_length = len(temp_string)
         format_string = f'>{buffer_length}s'
 

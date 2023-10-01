@@ -13,7 +13,7 @@ class Param:
 
 
 
-client_ip = 'alexey-pc'
+client_ip = 'localhost'
 client_port = 1545
 
 logpass = dict()
@@ -26,6 +26,6 @@ clusters = connection.recv_cluster_objects()
 connection.authentication(clusters[0])
 db_list = connection.get_infobase_summary_list(clusters[0])
 summary_for_base = connection.get_infobase_summary_for_infobase(clusters[0], db_list[0])
+connection.authentication_to_ib(clusters[0], logpass["login"], logpass["pwd"])
 data = connection.get_infobase_full_info(clusters[0], db_list[0])
-print(data)
 connection.disconnect()

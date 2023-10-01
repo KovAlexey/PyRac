@@ -74,11 +74,11 @@ class RacConnection:
             data += self._socket.recv(packet_size)
             recv_len = len(data)
 
-    def authentication_to_ib(self, clusterObject: RacClusterObject, infobaseObject: RacInfobaseObject, login='', pwd=''):
+    def authentication_to_ib(self, clusterObject: RacClusterObject, login='', pwd=''):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
         packet.add_header(PacketMessage.INFOBASE_AUTORIZATION_REQUEST)
         packet.add_bytes(clusterObject.getuuid().bytes)
-        packet.add_bytes(infobaseObject.getuuid().bytes)
+        #packet.add_bytes(infobaseObject.getuuid().bytes)
         if len(login) > 0:
             packet.add_string(login)
         if len(pwd) > 0:
