@@ -97,8 +97,7 @@ class RacConnection:
         data = self.recv_with_size()
 
         ib_full_info = RacInfobaseObject.CreateFromBytes(data)
-
-        print(data)
+        return ib_full_info
 
     def get_infobase_summary_list(self, clusterObject: RacClusterObject):
         packet = RacPacket(PacketType.PACKET_TYPE_MESSAGE)
